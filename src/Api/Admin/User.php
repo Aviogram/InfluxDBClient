@@ -1,6 +1,7 @@
 <?php
-namespace Aviogram\InfluxDB\Api;
+namespace Aviogram\InfluxDB\Api\Admin;
 
+use Aviogram\InfluxDB\AbstractApi;
 use Aviogram\InfluxDB\Collection;
 use Aviogram\InfluxDB\Entity;
 
@@ -40,17 +41,18 @@ class User extends AbstractApi
      */
     public function getList()
     {
-        $result = $this->query("SHOW USERS");
-        $return = new Collection\User();
+        $result = $this->query(
+            "SHOW USERS",
+            $this->getValueBuilder('Aviogram\InfluxDB\Entity\Admin\User')
+                ->addField('user', 'getName', 'setName')
+                ->addField('admin', 'isAdmin', 'setAdmin')
+        );
+
+        $return = new Collection\Admin\User();
 
         foreach ($result->getSeries() as $serie) {
-            foreach ($serie->getValues() as $value) {
-                $username =           $value->offsetGet(0);
-                $isAdmin  = (boolean) $value->offsetGet(1);
-
-                $user = new Entity\User($username, $isAdmin);
-
-                $return->append($user);
+            foreach($serie->getValues() as $value) {
+                $return->append($value);
             }
         }
 

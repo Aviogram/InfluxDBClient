@@ -1,6 +1,7 @@
 <?php
-namespace Aviogram\InfluxDB\Api;
+namespace Aviogram\InfluxDB\Api\Admin;
 
+use Aviogram\InfluxDB\AbstractApi;
 use Aviogram\InfluxDB\Collection;
 use Aviogram\InfluxDB\Entity;
 
@@ -56,17 +57,21 @@ class Database extends AbstractApi
     /**
      * Return list of databases
      *
-     * @return Collection\Database
+     * @return Collection\Admin\Database
      */
     public function getList()
     {
-        $result = $this->query('SHOW DATABASES');
-        $return = new Collection\Database();
+        $result = $this->query(
+            'SHOW DATABASES',
+            $this->getValueBuilder('Aviogram\InfluxDB\Entity\Admin\Database')
+                ->addField('name', 'getName', 'setName')
+        );
+
+        $return = new Collection\Admin\Database();
 
         foreach ($result->getSeries() as $row) {
-            foreach ($row->getValues() as $values) {
-                $database = new Entity\Database($values->current());
-                $return->append($database);
+            foreach ($row->getValues() as $value) {
+                $return->append($value);
             }
         }
 

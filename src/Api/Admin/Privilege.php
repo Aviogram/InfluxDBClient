@@ -1,5 +1,7 @@
 <?php
-namespace Aviogram\InfluxDB\Api;
+namespace Aviogram\InfluxDB\Api\Admin;
+
+use Aviogram\InfluxDB\AbstractApi;
 
 class Privilege extends AbstractApi
 {
@@ -137,8 +139,6 @@ class Privilege extends AbstractApi
         }
 
         $query = implode(' ', $parts);
-
-        echo $query . PHP_EOL;
 
         return ($this->query($query)->hasError() === false);
     }

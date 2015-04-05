@@ -2,7 +2,8 @@
     "name": "aviogram/influxdbclient",
     "description": "InfluxDB PHP client library",
     "require": {
-        "psr/log": "1.0"
+        "psr/log": "1.0",
+        "aviogram/common": "dev-master"
     },
     "license": "MIT",
     "authors": [

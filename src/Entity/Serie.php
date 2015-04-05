@@ -1,9 +1,10 @@
 <?php
 namespace Aviogram\InfluxDB\Entity;
 
+use Aviogram\Common\AbstractEntity;
 use Aviogram\InfluxDB\Collection;
 
-class Serie implements \JsonSerializable
+class Serie extends AbstractEntity
 {
     /**
      * @var string
@@ -11,67 +12,22 @@ class Serie implements \JsonSerializable
     protected $name;
 
     /**
-     * @var Collection\ArrayIterator
+     * @var Collection\Tags
      */
     protected $tags;
 
     /**
-     * @var Collection\ArrayIterator
-     */
-    protected $columns;
-
-    /**
-     * @var Collection\ArrayIterator
+     * @var Collection\Values
      */
     protected $values;
 
     /**
-     * Construct internal objects
-     *
-     * @param string $name
+     * Create inner entities
      */
-    public function __construct($name)
+    public function __construct()
     {
-        $this->name    = $name;
-        $this->tags    = new Collection\ArrayIterator();
-        $this->columns = new Collection\ArrayIterator();
-        $this->values  = new Collection\ArrayIterator();
-    }
-
-    /**
-     * @param  string $tag
-     *
-     * @return $this
-     */
-    public function addTag($tag)
-    {
-        $this->tags->append($tag);
-
-        return $this;
-    }
-
-    /**
-     * @param  string $column
-     *
-     * @return $this
-     */
-    public function addColumn($column)
-    {
-        $this->columns->append($column);
-
-        return $this;
-    }
-
-    /**
-     * @param Collection\ArrayIterator $values
-     *
-     * @return $this
-     */
-    public function addValue(Collection\ArrayIterator $values)
-    {
-        $this->values->append($values);
-
-        return $this;
+        $this->tags   = new Collection\Tags();
+        $this->values = new Collection\Values();
     }
 
     /**
@@ -83,7 +39,19 @@ class Serie implements \JsonSerializable
     }
 
     /**
-     * @return Collection\ArrayIterator
+     * @param string $name
+     *
+     * @return Serie
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection\Tags
      */
     public function getTags()
     {
@@ -91,15 +59,19 @@ class Serie implements \JsonSerializable
     }
 
     /**
-     * @return Collection\ArrayIterator
+     * @param Collection\Tags $tags
+     *
+     * @return Serie
      */
-    public function getColumns()
+    public function setTags(Collection\Tags $tags)
     {
-        return $this->columns;
+        $this->tags = $tags;
+
+        return $this;
     }
 
     /**
-     * @return Collection\ArrayIterator
+     * @return Collection\Values
      */
     public function getValues()
     {
@@ -107,14 +79,14 @@ class Serie implements \JsonSerializable
     }
 
     /**
-     * (PHP 5 &gt;= 5.4.0)<br/>
-     * Specify data which should be serialized to JSON
-     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
+     * @param Collection\Values $values
+     *
+     * @return Serie
      */
-    function jsonSerialize()
+    public function setValues(Collection\Values $values)
     {
-        return get_object_vars($this);
+        $this->values = $values;
+
+        return $this;
     }
 }

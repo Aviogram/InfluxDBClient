@@ -1,12 +1,24 @@
 <?php
 namespace Aviogram\InfluxDB;
 
+use Aviogram\Common\Plugin\PluginTrait;
+
 class Client
 {
+    use PluginTrait;
+
     /**
      * @var ClientOptions
      */
     protected $clientOptions;
+
+    /**
+     * @var array
+     */
+    protected $plugins = array(
+        'admin' => 'Aviogram\InfluxDB\Api\Admin',
+        'write' => 'Aviogram\InfluxDB\Api\Write',
+    );
 
     /**
      * @param ClientOptions $clientOptions
@@ -17,59 +29,23 @@ class Client
     }
 
     /**
-     * @return Api\Database
+     * @return Api\Admin
      */
-    public function database()
+    public function admin()
     {
-        static $instance = null;
-
-        if ($instance === null) {
-            $instance = new Api\Database($this->getRequest(), $this->getClientOptions()->getLogger());
-        }
-
-        return $instance;
+        return $this->getPlugin('admin', function($class) {
+            return new $class($this->getRequest(), $this->getClientOptions()->getLogger());
+        });
     }
 
     /**
-     * @return Api\User
+     * @return Api\Write
      */
-    public function user()
+    public function write()
     {
-        static $instance = null;
-
-        if ($instance === null) {
-            $instance = new Api\User($this->getRequest(), $this->getClientOptions()->getLogger());
-        }
-
-        return $instance;
-    }
-
-    /**
-     * @return Api\Retention
-     */
-    public function retention()
-    {
-        static $instance = null;
-
-        if ($instance === null) {
-            $instance = new Api\Retention($this->getRequest(), $this->getClientOptions()->getLogger());
-        }
-
-        return $instance;
-    }
-
-    /**
-     * @return Api\Privilege
-     */
-    public function privilege()
-    {
-        static $instance = null;
-
-        if ($instance === null) {
-            $instance = new Api\Privilege($this->getRequest(), $this->getClientOptions()->getLogger());
-        }
-
-        return $instance;
+        return $this->getPlugin('write', function($class) {
+            return new $class($this->getRequest(), $this->getClientOptions()->getLogger());
+        });
     }
 
     /**
@@ -98,5 +74,17 @@ class Client
     protected function getClientOptions()
     {
         return $this->clientOptions;
+    }
+
+    /**
+     * Checks if the given plugin implements the correct parent classes/interfaces
+     *
+     * @param  string $class
+     *
+     * @return boolean
+     */
+    protected function isCorrectPlugin($class)
+    {
+        return is_subclass_of($class, 'Aviogram\InfluxDB\AbstractApi');
     }
 }
